@@ -25,6 +25,7 @@ public class ItemController {
 	
 	@GetMapping("/items")	// 20.3
 	public String index(
+			@RequestParam(name = "keyword", defaultValue = "") String keyword,
 			@RequestParam(name = "categoryId", defaultValue = "") Integer categoryId,
 			Model model) {
 		// カテゴリーリストを取得
@@ -33,7 +34,9 @@ public class ItemController {
 		model.addAttribute("categoryList", categoryList);			// seq:20.5
 		// すべての商品リストを取得
 		List<Item> itemList = null;
-		if (categoryId == null) {
+		if (!keyword.isEmpty()) {
+			itemList = itemRepository.findByNameContaining(keyword);
+		} else if (categoryId == null) {
 			itemList = itemRepository.findAll(); // seq:20.6
 		} else {
 			itemList = itemRepository.findByCategoryId(categoryId); // seq:20.7
@@ -43,4 +46,5 @@ public class ItemController {
 		// 取得したカテゴリーリストをスコープに登録
 		return "items";									// seq:20.9
 	}
+	
 }
