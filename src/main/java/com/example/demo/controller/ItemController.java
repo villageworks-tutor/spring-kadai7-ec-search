@@ -60,6 +60,8 @@ public class ItemController {
 		}
 		// 取得した商品リストをスコープに登録
 		model.addAttribute("itemList", itemList);		// seq:20.8
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("maxPrice", maxPrice);
 		// 取得したカテゴリーリストをスコープに登録
 		return "items";									// seq:20.9
 	}
