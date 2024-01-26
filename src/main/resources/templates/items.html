@@ -29,7 +29,7 @@
 				</tr>
 				<tr th:each="item:${itemList}">
 					<td th:text="${item.id}"></td>
-					<td th:text="${item.name}"></td>
+					<td><a th:href="'/items/' + ${item.id}" th:text="${item.name}"></td>
 					<td th:text="${item.price}"></td>
 					<td>
 						<form action="/cart/add" method="post">
