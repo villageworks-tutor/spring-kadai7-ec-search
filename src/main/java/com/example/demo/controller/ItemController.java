@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.demo.entity.Category;
@@ -65,5 +66,18 @@ public class ItemController {
 		// 取得したカテゴリーリストをスコープに登録
 		return "items";									// seq:20.9
 	}
+	
+	@GetMapping("/items/{id}")
+	public String show(
+			@PathVariable("id") Integer id,
+			Model model) {
+		// パスパラメータをもとにデータベースから商品を取得
+		Item item = itemRepository.findById(id).get();
+		// 取得した商品をスコープに登録
+		model.addAttribute("item", item);
+		// 画面遷移
+		return "itemDetail";
+	}
+	
 	
 }
