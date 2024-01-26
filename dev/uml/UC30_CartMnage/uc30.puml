@@ -1,0 +1,70 @@
+@startuml UC30：カート機能
+!include ../classifiers.pu
+skinparam style strictuml
+hide unlinked
+title UC30：カート機能
+
+== UC31 カートを見る ==
+autonumber 31.1
+user --> cartController: [GET] /cart\n index()
+activate cartController
+return [view] cart
+
+== UC32 カートに入れる ==
+autonumber 32.1
+group Springフレームワーク
+	cartController -> cart: @Autowired
+	activate cart
+	autonumber stop
+	return cart
+	autonumber resume
+	cartController -> itemRepository: @Autowired
+	activate itemRepository
+	autonumber stop
+	return itemRepository
+	autonumber resume
+end group
+
+user --> cartController: [POST] /cart/add\n addCart(itemId: Integer, quantity: Integer = 1, model: Model)
+activate cartController
+
+cartController -> itemRepository: findById(itemId)
+activate itemRepository
+group Springフレームワーク
+	autonumber stop
+	itemRepository -> db: [SQL] SELECT * FROM items WHERE id = ?
+	itemRepository <-- db: ResultSet
+	itemRepository -> item: new Item()
+	activate item
+	return item
+	itemRepository -> itemRepository: item = null
+	alt ResultSetが要素をもつ場合
+		itemRepository -> item: new Item(id, categoryId, name, price)
+	end
+	autonumber resume
+end group
+autonumber stop
+cartController <-- itemRepository: item
+autonumber resume
+deactivate itemRepository
+
+cartController -> cartController: item.setQuantity(quantity)
+cartController -> cartController: cart.add(item)
+user <-- cartController: [redirect] /cart
+deactivate cartController
+
+== UC33 カートから商品を削除 ==
+autonumber 32.1
+group Springフレームワーク
+	cartController -> cart: @Autowired
+	activate cart
+	autonumber stop
+	return cart
+	autonumber 33.1
+end group
+
+user -> cartController: [POST] /cart/delete\n deleteCart(itemId)
+activate cartController
+cartController -> cartController: cart.delete(itemId)
+user <-- cartController: [redirect] /cart
+@enduml
