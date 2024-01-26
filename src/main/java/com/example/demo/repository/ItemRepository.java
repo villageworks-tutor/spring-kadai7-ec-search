@@ -14,4 +14,10 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
 	 */
 	List<Item> findByCategoryId(Integer categoryId);
 
+	/**
+	 * キーワード検索
+	 * SELECT * FROM items WHERE name LIKE ?
+	 */
+	List<Item> findByNameContaining(String name);
+
 }
