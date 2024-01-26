@@ -25,6 +25,7 @@ public class ItemController {
 	
 	@GetMapping("/items")	// 20.3
 	public String index(
+			@RequestParam(name = "maxPrice", defaultValue = "") Integer maxPrice,
 			@RequestParam(name = "keyword", defaultValue = "") String keyword,
 			@RequestParam(name = "categoryId", defaultValue = "") Integer categoryId,
 			Model model) {
@@ -34,12 +35,28 @@ public class ItemController {
 		model.addAttribute("categoryList", categoryList);			// seq:20.5
 		// すべての商品リストを取得
 		List<Item> itemList = null;
-		if (!keyword.isEmpty()) {
-			itemList = itemRepository.findByNameContaining(keyword);
-		} else if (categoryId == null) {
-			itemList = itemRepository.findAll(); // seq:20.6
+		if (keyword.isEmpty() && maxPrice == null) {
+			// キーワードおよび価格上限が未入力の場合：もとのサンプルショッピングの状況を実現
+			if (categoryId == null) {
+				itemList = itemRepository.findAll(); // seq:20.6
+			} else {
+				itemList = itemRepository.findByCategoryId(categoryId); // seq:20.7
+			}
 		} else {
-			itemList = itemRepository.findByCategoryId(categoryId); // seq:20.7
+			if (!keyword.isEmpty()) {
+				if (maxPrice == null) {
+					// キーワードが入力されかつ価格上限値が未入力の場合
+					itemList = itemRepository.findByNameContaining(keyword);
+				} else {
+					// キーワード・価格上限値ともに入力されている場合
+					itemList = itemRepository.findByNameContainingAndPriceLessThanEqual(keyword, maxPrice);
+				}
+			} else {
+				// キーワード未入力かつ価格上限値を入力されている場合
+				if (maxPrice != null) {
+					itemList = itemRepository.findByPriceLessThanEqual(maxPrice);
+				}
+			}
 		}
 		// 取得した商品リストをスコープに登録
 		model.addAttribute("itemList", itemList);		// seq:20.8
