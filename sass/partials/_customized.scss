@@ -1,0 +1,33 @@
+@charset "utf-8";
+
+header {
+  p {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+nav {
+  a {
+    margin: 0 5px;
+  }
+}
+
+.copyright {
+  font-size: small;
+}
+
+.complete_message {
+  margin: 40px 0 0px;
+  font-size: large;
+}
+
+.orderNumber {
+  color: tomato;
+  margin: 20px 0 20px;
+  font-weight: bold;
+}
+
+td[colspan="5"] {
+  text-align: right;
+}

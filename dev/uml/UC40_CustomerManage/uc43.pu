@@ -1,0 +1,124 @@
+@startuml UC43：
+!include ../classifiers.pu
+skinparam style strictuml
+hide unlinked
+
+== UC43 注文確定処理 ==
+autonumber 43.1
+
+group Springフレームワーク
+orderController -> cart: @Autowired
+activate cart
+autonumber stop
+return cart
+autonumber resume
+orderController -> customerRepository: @Autowired
+activate customerRepository
+autonumber stop
+return customerRepository
+autonumber resume
+orderController -> orderRepository: @Autowired
+activate orderRepository
+autonumber stop
+return orderRepository
+autonumber resume
+orderController -> detailRepository: @Autowired
+activate detailRepository
+autonumber stop
+return ordeDetailRepository
+autonumber resume
+end group
+
+user -> orderController: [POST] /order\n order(name: String, address: String, tel: String, email: String, model: Model)
+
+orderController -> customer: new Customer(name, address, tel, email)
+autonumber stop
+orderController <-- customer: customer
+autonumber resume
+orderController -> customerRepository: save(customer)
+
+group Springフレームワーク
+	autonumber stop
+	customerRepository -> db: INSERT INTO customers (name, address, tel, email) VALUES (?, ?, ?, ?)
+	autonumber resume
+end group
+
+orderController -> customer: getId()
+activate customer
+autonumber stop
+return customerId
+autonumber resume
+
+orderController -> date: now()
+activate date
+autonumber stop
+return today
+autonumber resume
+
+orderController -> cart: getTotalPrice()
+activate cart
+autonumber stop
+return totalPrice
+autonumber resume
+
+orderController -> order: new Order(customerId, today, totalPrice)
+activate order
+autonumber stop
+return order
+autonumber resume
+
+orderController -> orderRepository: save(order)
+
+group Springフレームワーク
+	autonumber stop
+	orderRepository -> db: INSERT INTO orders (customer_id, ordered_on, total_price) VALUES (?, ?, ?)
+	autonumber resume
+end group
+
+orderController -> list: new ArrayLIst<OrderDetail>()
+activate list
+autonumber stop
+return detailList
+autonumber resume
+
+orderController -> cart: getItems()
+autonumber stop
+return itemList
+autonumber resume
+
+loop カート内の商品数分
+	orderController -> orderController: item = itemList.get()
+	orderController -> order: getId()
+	autonumber stop
+	return orderId
+	autonumber resume
+	orderController -> item: getId()
+	autonumber stop
+	return itemId
+	autonumber resume
+	orderController -> item: getQuantity()
+	autonumber stop
+	return quantity
+	autonumber resume
+	orderController -> detail: new OrderDetail(orderId, itemIOd, quantity)
+	autonumber stop
+	return detail
+	autonumber resume
+	orderController -> orderController: detailList.add(detail)
+end lopp
+
+orderController -> detailRepository: saveAll(detailList)
+
+group Springフレームワーク
+	orderRepository -> db: INSERT INTO order_details (order_id, item_id, quantity) VALUES (?, ?, ?)
+end group
+
+orderController -> order: getId()
+autonumber stop
+return orderNumber
+autonumber resume
+
+orderController -> orderController: model.addAttribute("orderNumber", orderNumber)
+
+user <-- orderController: [view] ordered
+@enduml

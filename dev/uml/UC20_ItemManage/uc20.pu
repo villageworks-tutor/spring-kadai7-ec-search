@@ -1,0 +1,116 @@
+@startuml UC20：商品一覧機能
+!include ../classifiers.pu
+skinparam style strictuml
+hide unlinked
+title UC20：商品一覧機能
+
+== UC21 商品一覧表示 ==
+autonumber 21.1
+group Springフレームワーク
+	itemController -> itemRepository: @Autowired
+	activate itemRepository
+	autonumber stop
+	return itemRepository
+	autonumber resume
+end group
+
+user -> itemController: [GET] /items\n index(model: Model)
+activate itemController
+
+itemController -> itemRepository: findAll()
+activate itemRepository
+
+group Springフレームワーク
+	autonumber stop
+	itemRepository -> db: SELECT * items
+	itemRepository <-- db: ResultSet
+	itemRepository -> list: new ArrayList<Item>()
+	activate list
+	return itemList
+
+	loop 商品リストのレコード件数分
+		itemRepository -> item: new Item(id, categoryId, name, priced)
+		activate item
+		return item
+		itemRepository -> itemRepository: itemList.add(item)
+	end loop
+	autonumber resume
+end group
+
+autonumber stop
+return itemList
+autonumber resume
+itemController -> itemController: mode.addAttribute()
+user <-- itemController: [view] items
+deactivate itemController
+
+== UC22 カテゴリー別商品一覧表示 ==
+autonumber 22.1
+group Springフレームワーク
+	itemController -> categoryRepository: @Autowired
+	activate categoryRepository
+	autonumber stop
+	return categoryRepository
+	autonumber resume
+	itemController -> itemRepository: @Autowired
+	activate itemRepository
+	autonumber stop
+	return itemRepository
+	autonumber resume
+end group
+
+user -> itemController: [GET] /items?categoryId=xx\n items(categoryId: Integer, model: Model)
+activate itemController
+
+itemController -> categoryRepository: findAll()
+activate categoryRepository
+
+	group Springフレームワーク
+		autonumber stop
+		categoryRepository -> db: SELECT * FROM categories
+		categoryRepository <-- db: ResultSet
+		categoryRepository -> list: new ArrayLisyt<Category>()
+		activate list
+		return categoryList
+
+		loop カテゴリーリストのレコード件数分
+			categoryRepository -> category: new Category(id, name)
+			activate category
+			return category
+			categoryRepository -> categoryRepository: categoryList.add(category)
+		end loop
+		autonumber resume
+	end group
+
+autonumber stop
+return categoryList
+autonumber resume
+itemController -> itemController: model.addAttribute("categoryList", categoryList)
+
+itemController -> itemRepository: findByCategoryId(categoryId)
+activate itemRepository
+	group Springフレームワーク
+		autonumber stop
+		itemRepository -> db: SELECT * items WHERE category_id = ?
+		itemRepository <-- db: ResultSet
+		itemRepository -> list: new ArrayList<Item>()
+		activate list
+		return itemList
+
+		loop 商品リストのレコード件数分
+			itemRepository -> item: new Item(id, categoryId, name, priced)
+			activate item
+			return item
+			itemRepository -> itemRepository: itemList.add(item)
+		end loop
+		autonumber resume
+	end group
+autonumber stop
+return itemList
+autonumber resume
+itemController -> itemController: model.addAttribute("itemList", itemList)
+
+user <-- itemController: [view]items
+
+@enduml
+

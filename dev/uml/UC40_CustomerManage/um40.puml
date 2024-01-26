@@ -1,0 +1,118 @@
+@startuml UC40：注文処理
+!include ../classifiers.pu
+skinparam style strictuml
+hide unlinked
+title UC40：注文処理
+
+== UC41 顧客情報を入力する==
+autonumber 41.1
+group Springフレームワーク
+	orderController -> cart: @Autowired
+	activate cart
+	autonumber stop
+	return cart
+	autonumber resume
+end group
+
+user -> orderController: [GET] /order\n index()
+activate orderController
+return [view] customerForm
+
+== UC 42 顧客情報を確認する ==
+autonumber 42.1
+user -> orderController: [POST] /order/confirm\n confirm(name: String, address: String, tel: String, email: String, model: Model)
+activate orderController
+orderController -> customer: new Customer(name, address, tel, email)
+activate customer
+autonumber stop
+orderController <-- customer: customer
+autonumber resume
+deactivate customer
+orderController -> orderController: model.addAttribute("customer", customer)
+user <-- orderController: [view] confirm
+deactivate orderController
+
+== UC43 注文する ==
+autonumber 41.1
+group Springフレームワーク
+	orderController -> cart: @Autowired
+	activate cart
+	autonumber stop
+	return cart
+	autonumber 43.1
+  orderController -> session: @Autowired
+	activate session
+	autonumber stop
+	return session
+  autonumber resume
+  orderController -> customerRepository: @Autowired
+  activate customerRepository
+	autonumber stop
+  return customerRepository
+  autonumber resume
+  orderController -> orderRepository: @Autowired
+  activate orderRepository
+	autonumber stop
+  return orderRepository
+  autonumber resume
+  orderController -> detailRepository: @AUtowired
+  activate detailRepository
+ 	autonumber stop
+  return detailRepository
+  autonumber resume
+end group
+
+user -> orderController: [POST] /order\n order(name, address, tel, email)
+activate orderController
+orderController -> customer: new Customer(name, address, tel, email)
+activate customer
+autonumber stop
+return customer
+
+autonumber resume
+orderController -> customerRepository: save(customer)
+group Springフレームワーク
+  autonumber stop
+  customerRepository -> db: INSRET INTO customers (name, address, tel, email) VALUES (?, ?, ?, ?)
+  autonumber resume
+end group
+
+orderController -> date: now()
+activate date
+autonumber stop
+return today
+autonumber resume
+orderController -> orderController: customerId = customer.getId()
+orderController -> orderController: totalPrice = cart.getTotalPrice()
+orderController -> order: new Order(customerId, today, totalPrice)
+autonumber stop
+orderController <-- order: order
+autonumber resume
+orderController -> orderRepository: save(order)
+group Springフレームワーク
+  autonumber stop
+  orderRepository -> db: INSERT INTO orders (customer_id, ordered_on, total_price) VALUES (?, ?, ?)
+  autonumber resume
+end group
+
+orderController -> list: new ArrayList<OrderDetail>()
+activate list
+autonumber stop
+return detailList
+autonumber resume
+orderController -> orderController: orderId = order.getId()
+
+loop カートの商品数分
+orderController -> detail: new OrderDetail(orderId, item.getId(), item.getQuantity)
+activate detail
+autonumber stop
+return detail
+autonumber resume
+orderController -> list: detailList.add(detail)
+end loop
+orderController -> detailRepository: saveAll(detailList)
+orderController -> orderController: model.addAttribute("orderNumber", orderId)
+orderController -> cart: clear()
+user <-- orderController: [VIEW] ordered
+
+@enduml

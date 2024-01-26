@@ -1,0 +1,43 @@
+@startuml UC10：ログイン認証
+!include ../classifiers.pu
+skinparam style strictuml
+hide unlinked
+title UC10：ログイン認証
+
+== UC11 ログイン画面表示 ==
+autonumber 11.1
+user -> itemController: [GET] /\n index()
+activate itemController
+return [VIEW] login
+
+== UC12 ログイン処理 ==
+autonumber 12.1
+group Springフレームワーク
+	itemController -> account: @Autowired
+	activate account
+	autonumber stop
+	return account
+	autonumber resume
+end group
+' メインユースケース
+user -> itemController: [POST] /login\n login(name)
+	activate itemController
+	itemController -> itemController: account.set(name)
+return [view] redirect:/items
+
+== UC13 ログアウト処理 ==
+autonumber 13.1
+group Springフレームワーク
+	itemController -> session: @Autowired
+	activate session
+	autonumber stop
+	return session
+	autonumber resume
+end group
+' メインユースケース
+user -> itemController: [GET] /logout\n logout()
+activate itemController
+	itemController -> itemController: session.invalidate()
+return [view] login
+
+@enduml

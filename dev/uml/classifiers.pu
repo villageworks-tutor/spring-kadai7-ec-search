@@ -1,0 +1,29 @@
+@startuml classifiers
+
+actor client as user
+
+control ItemController as itemController <<controller>>
+control CartController as cartController <<controller>>
+control OrderController as orderController <<controller>>
+
+participant ItemRepository as itemRepository <<repository>>
+participant CategoryRepository as categoryRepository <<repository>>
+participant CustomerRepository as customerRepository <<repository>>
+participant OrderRepository as orderRepository <<repository>>
+participant OrderDetailRepository as detailRepository <<repository>>
+
+participant Account as account <<model>>
+participant Cart as cart <<model>>
+entity Category as category <<entity>>
+entity Item as item <<entity>>
+entity Customer as customer <<entity>>
+entity Order as order <<entity>>
+entity OrderDetail as detail <<entity>>
+
+participant ArrayList as list <<List>>
+participant HttpSession as session <<SessionScope>>
+participant LocalDate as date <<LocalDate>>
+
+database spring_sample as db <<database>>
+
+@enduml
